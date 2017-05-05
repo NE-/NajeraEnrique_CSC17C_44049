@@ -1,0 +1,308 @@
+/*
+ * File: BigO_n_Proof.txt
+ * Author: Najera Enrique
+ * Date: 10 May 2017
+ * Purpose: Prove time complexity of
+ *          hashing functions to equal O(n)
+ */
+
+-------------------------------------------------------------------
+                                    Cost         Time
+RSHash (string str)                 
+    b = 378551                       C1            1
+    a = 63689                        C2            1
+    hash = 0                         C3            1
+    
+    for i = 0 to str.length do       C4          n + 1 
+        hash = hash * a + str[i]     C5            n
+        a    = a * b                 C6            n
+        i += 1                       C7          n + 1
+    
+    return hash                      C8            1
+    
+Total Cost = C1 + C2 + C3 + C4(n + 1) + C5n + C6n + C7(n + 1) + C8
+Total Cost = C1 + C2 + C3 + C4n + C4 + C5n + C6n + C7n + C7 + C8
+Total Cost = C1 + C2 + C3 + C4 +  C7 + C8 + C4n  + C5n + C6n + C7n
+Total Cost = C1 + C2 + C3 + C4 +  C7 + C8 + n(C4  + C5 + C6 + C7)
+
+/*
+ * Let C1 + C2 + C3 + C4 +  C7 + C8 = A
+ * Let C4  + C5 + C6 + C7 = B
+ */
+
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                          Cost              Time
+JSHash(string str)
+   hash = 1315423911                                       C1                 1
+
+   for i = 0 to str.length do                              C2               n + 1
+      hash ^= ((hash << 5) + str[i] + (hash >> 2))         C3                 n
+      i += 1                                               C4                 n
+
+   return hash                                             C5                 1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                                                        Cost      Time
+PJWHash(string str)
+   BitsInUnsignedInt = (unsigned int)(sizeof(unsigned int) * 8)                          C1         1
+   ThreeQuarters     = (unsigned int)((BitsInUnsignedInt  * 3) / 4)                      C2         1
+   OneEighth         = (unsigned int)(BitsInUnsignedInt / 8)                             C3         1
+   HighBits          = (unsigned int)(0xFFFFFFFF) << (BitsInUnsignedInt - OneEighth)     C4         1
+   hash              = 0                                                                 C5         1
+   test              = 0                                                                 C6         1
+
+   for i = 0 to str.length do                                                            C7       n + 1
+      hash = (hash << OneEighth) + str[i]                                                C8         n
+
+      if((test = hash & HighBits)  != 0)                                                 C9         n
+         hash = (( hash ^ (test >> ThreeQuarters)) & (~HighBits))                        C10        n worst case
+      
+      i += 1                                                                             C11        n
+
+   return hash                                                                           C12        1
+   
+Total Cost = C1 + C2 + C3 + C4 + C5 + C6 + C7(n + 1) + C8n + C9n + C10n + C11n + C12
+Total Cost = C1 + C2 + C3 + C4 + C5 + C6 + C7n + C7 + C8n + C9n + C10n + C11n + C12
+Total Cost = C1 + C2 + C3 + C4 + C5 + C6 + C7 + C12 + C7n  + C8n + C9n + C10n + C11n
+Total Cost = C1 + C2 + C3 + C4 + C5 + C6 + C7 + C12 + n(C7 + C8 + C9 + C10 + C11)
+
+/*
+ * Let C1 + C2 + C3 + C4 + C5 + C6 + C7 + C12 = A
+ * Let C7 + C8 + C9 + C10 + C11 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                 Cost     Time
+ELFHash(string str)
+   hash = 0                                       C1        1
+   x    = 0                                       C2        1
+
+   for i = 0 to str.length do                     C3      n + 1
+      hash = (hash << 4) + str[i]                 C4        n
+      if((x = hash & 0xF0000000L) != 0)           C5        n
+        hash ^= (x >> 24)                         C6        n
+      hash &= ~x                                  C7        n
+      
+      i += 1                                      C8        n
+
+   return hash                                    C9        1
+   
+Total Cost = C1 + C2 + C3(n + 1) + C4n + C5n + C6n + C7n + C8n + C9
+Total Cost = C1 + C2 + C3n + C3 + C4n + C5n + C6n + C7n + C8n + C9
+Total Cost = C1 + C2 + C3 + C9 + C3n + C4n + C5n + C6n + C7n + C8n
+Total Cost = C1 + C2 + C3 + C9 + n(C3 + C4 + C5 + C6 + C7 + C8)
+
+/*
+ * Let C1 + C2 + C3 + C9 = A
+ * Let C3 + C4 + C5 + C6 + C7 + C8 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                    Cost     Time
+BKDRHash(string str)
+   seed = 131; // 31 131 1313 13131 131313 etc..     C1       1
+   hash = 0                                          C2       1
+
+   for i = 0 to str.length do                        C3      n + 1
+      hash = (hash * seed) + str[i]                  C4        n
+      i += 1                                         C5        n
+
+   return hash                                       C6        1
+   
+Total Cost = C1 + C2 + C3(n + 1) + C4n + C5n + C6
+Total Cost = C1 + C2 + C3n + C3 + C4n + C5n + C6
+Total Cost = C1 + C2 + C3 + C6 + C3n + C4n + C5n
+Total Cost = C1 + C2 + C3 + C6 + n(C3 + C4 + C5)
+
+/*
+ * Let C1 + C2 + C3 + C6 = A
+ * Let C3 + C4 + C5 = B
+ */
+
+Total Cost = A + n(B) = O(n)
+ 
+-------------------------------------------------------------------
+                                                              Cost     Time
+SDBMHash(string str)
+   hash = 0                                                    C1        1
+
+   for i = 0 to str.length do                                  C2      n + 1
+      hash = str[i] + (hash << 6) + (hash << 16) - hash        C3        n
+      i += 1                                                   C4        n
+
+   return hash                                                 C5        1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+
+Total Cost = A + n(B) = O(n)
+ 
+-------------------------------------------------------------------
+                                                  Cost     Time
+DJBHash(string str)
+   hash = 5381                                     C1        1
+
+   for i = 0 to str.length                         C2      n + 1
+      hash = ((hash << 5) + hash) + str[i]         C3        n
+      i += 1                                       C4        n
+
+   return hash                                     C5        1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                       Cost     Time
+DEKHash(string str)
+  hash = static_cast<unsigned int>(str.length())        C1        1
+
+   for i = 0 to str.length                              C2      n + 1
+      hash = ((hash << 5) ^ (hash >> 27)) ^ str[i]      C3        n
+      i += 1                                            C4        n
+
+   return hash                                          C5        1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                     Cost    Time
+BPHash(string str)
+   hash = 0                            C1      1
+   
+   for i = 0 to str.length             C2    n + 1
+      hash = hash << 7 ^ str[i]        C3      n
+      i += 1                           C4      n
+
+   return hash                         C5      1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                    Cost      Time
+FNVHash(string str)
+   fnv_prime = 0x811C9DC5            C1         1
+   hash = 0                          C2         1
+   
+   for i = 0 to str.length           C3       n + 1
+      hash *= fnv_prime              C4         n
+      hash ^= str[i]                 C5         n
+      i += 1                         C6         n
+
+   return hash                       C7         1
+   
+Total Cost = C1 + C2 + C3(n + 1) + C4n + C5n + C6n + C7
+Total Cost = C1 + C2 + C3n + C3 + C4n + C5n + C6n + C7
+Total Cost = C1 + C2 + C3 + C7 + C3n + C4n + C5n + C6n
+Total Cost = C1 + C2 + C3 + C7 + n(C3 + C4 + C5 + C6)
+
+/*
+ * Let C1 + C2 + C3 + C7 = A
+ * Let C3 + C4 + C5 + C6 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+                                                                                 Cost    Time
+APHash(string str)
+   hash = 0xAAAAAAAA                                                              C1        1
+
+   for i = 0 to str.length                                                        C2      n + 1
+      hash ^= ((i & 1) == 0) ? (  (hash <<  7) ^ str[i] * (hash >> 3)) :          C3        n
+                               (~((hash << 11) + (str[i] ^ (hash >> 5))))
+        i += 1                                                                    C4        n
+
+   return hash                                                                    C5        1
+   
+Total Cost = C1 + C2(n + 1) + C3n + C4n + C5
+Total Cost = C1 + C2n + C2 + C3n + C4n + C5
+Total Cost = C1 + C2 + C5 + C2n + C3n + C4n
+Total Cost = C1 + C2 + C5 + n(C2 + C3 + C4)
+
+/*
+ * Let C1 + C2 + C5 = A
+ * Let C2 + C3 + C4 = B
+ */
+ 
+Total Cost = A + n(B) = O(n)
+
+-------------------------------------------------------------------
+
+                    Proof A + n(B) = O(n)
+                    
+Definition: f(n) = O(n) 
+            if f(n) <= C * n for all n >= k
+            where C > 0 and k > 0
+            
+Prove Bn + A = O(n)
+    /** Let C = 5 and k = 1 **/
+    /** Let n >= 1 **/
+    
+    B(n) + A <= 5 * n
+    B(n) <= 5n - A
+    1    <= (5n - A) / B(n)
+    1    <= (5n / B(n)) + (-A / B(n))
+    1    <= (5 / B) - (A / B(n))
+    
+Test
+    
+    /** Let A = 1, B = 2, and n = 3 **/
+    
+    1 <= (5 / 2) - (1 / 2(3)) for all n >= 1
+    1 <= 2.5 - (1 / 6)
+    1 <= 2.5 - 1.666
+    1 <= 2.33334      true!
